@@ -65,5 +65,5 @@ while 1:
   time.sleep(2)
 
 # play stream
-command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/btcontrol -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_file)
+command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/.btfifo -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_file)
 subprocess.call(command, shell=True)
