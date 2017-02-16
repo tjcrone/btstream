@@ -30,6 +30,7 @@ def download_file(stream_name, stream_url, stream_file):
 
 # parse command line
 stream_name = 'thegist' # hard code for testing
+stream_name = 'majority' # hard code for testing
 #stream_name = 'wnyc' # hard code for testing
 
 # define stream parameters based on stream_name
@@ -38,6 +39,9 @@ if stream_name == 'thegist':
   stream_url = get_stream_url(stream_name)
   stream_file = '/home/root/tmp.mp3'
   download_file(stream_name, stream_url, stream_file)
+  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+if stream_name == 'majority':
+  stream_file = 'http://live.majority.fm:8000/live'
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
 if stream_name == 'wnyc':
   stream_file = 'http://fm939.wnyc.org/wnycfm'
