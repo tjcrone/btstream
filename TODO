@@ -1,0 +1,4 @@
+add command line parser
+write btcontrol script that can control mplayer through the FIFO
+create the fifo if it doesn't exist
+add the ability to stream any live stream from the command line 
