@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+# This script ...
+#
+# Timothy Crone (tjcrone@gmail.com)
+
+# imports
+import subprocess, time
+
+# get url of the latest podcast episode
+def get_stream_url(stream_name):
+  n = 0
+  if stream_name == 'thegist':
+    r = requests.get('http://feeds.feedburner.com/TheGistWithMikePesca')
+    for line in r.iter_lines():
+      if 'enclosure' in line:
+        stream_url = line.split('"')[1]
+        n = n+1
+        if n == 1:
+          break
+    return stream_url
+
+# download podcast file
+def download_file(stream_name, stream_url, stream_file):
+  if stream_name == 'thegist':
+    with open(stream_file, 'wb') as handle:
+      r = requests.get(stream_url, stream=True)
+      if r.ok:
+        for block in r.iter_content(1024):
+          handle.write(block)
+
+# parse command line
+stream_name = 'thegist' # hard code for testing
+#stream_name = 'wnyc' # hard code for testing
+
+# define stream parameters based on stream_name
+if stream_name == 'thegist':
+  import requests
+  stream_url = get_stream_url(stream_name)
+  stream_file = '/home/root/tmp.mp3'
+  download_file(stream_name, stream_url, stream_file)
+  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+if stream_name == 'wnyc':
+  stream_file = 'http://fm939.wnyc.org/wnycfm'
+  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+
+# kill any current streams
+command = "killall -q mplayer"
+subprocess.call(command, shell=True)
+
+# unblock bluetooth
+command = "rfkill unblock bluetooth"
+subprocess.call(command, shell=True)
+
+# connect to speaker
+bt_sink="bluez_sink.C8_84_47_1B_0D_B8"
+bt_device = "C8:84:47:1B:0D:B8"
+while 1:
+  try:
+    command = "pactl list sinks | grep Name | grep %s" % bt_sink
+    bt_avail = subprocess.check_output(command, shell=True)
+    break
+  except:
+    command = "echo -e \"connect %s\\nquit\\n\" | bluetoothctl > /dev/null" % bt_device
+    subprocess.call(command, shell=True)
+  time.sleep(2)
+
+# play stream
+command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/btcontrol -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_file)
+subprocess.call(command, shell=True)
