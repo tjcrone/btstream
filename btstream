@@ -8,16 +8,19 @@ import subprocess, time
 
 # get url of the latest podcast episode
 def get_stream_url(stream_name):
-  n = 0
   if stream_name == 'thegist':
     r = requests.get('http://feeds.feedburner.com/TheGistWithMikePesca')
     for line in r.iter_lines():
       if 'enclosure' in line:
         stream_url = line.split('"')[1]
-        n = n+1
-        if n == 1:
-          break
-    return stream_url
+        break
+  if stream_name == "majority":
+    r = requests.get('http://feeds.feedburner.com/MajorityReport')
+    for line in r.iter_lines():
+      if 'mp3' in line:
+        stream_url = line.split('"')[1]
+        break
+  return stream_url
 
 # download podcast file
 def download_file(stream_name, stream_url, stream_file):
@@ -27,20 +30,30 @@ def download_file(stream_name, stream_url, stream_file):
       if r.ok:
         for block in r.iter_content(1024):
           handle.write(block)
+  if stream_name == 'majority':
+    command = "curl -s -L %s > %s" % (stream_url, stream_file)
+    subprocess.call(command, shell=True)
 
 # parse command line
-stream_name = 'thegist' # hard code for testing
+stream_name = 'majoritylive' # hard code for testing
 stream_name = 'majority' # hard code for testing
-#stream_name = 'wnyc' # hard code for testing
+stream_name = 'wnyc' # hard code for testing
+stream_name = 'thegist' # hard code for testing
 
 # define stream parameters based on stream_name
 if stream_name == 'thegist':
   import requests
   stream_url = get_stream_url(stream_name)
-  stream_file = '/home/root/tmp.mp3'
+  stream_file = '/home/root/btstream/tmp.mp3'
   download_file(stream_name, stream_url, stream_file)
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
 if stream_name == 'majority':
+  import requests
+  stream_url = get_stream_url(stream_name)
+  stream_file = '/home/root//btstream/tmp.mp3'
+  download_file(stream_name, stream_url, stream_file)
+  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+if stream_name == 'majoritylive':
   stream_file = 'http://live.majority.fm:8000/live'
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
 if stream_name == 'wnyc':
@@ -69,5 +82,5 @@ while 1:
   time.sleep(2)
 
 # play stream
-command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/.btfifo -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_file)
+command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/btstream/.btfifo -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_file)
 subprocess.call(command, shell=True)
