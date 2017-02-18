@@ -4,7 +4,7 @@
 # Timothy Crone (tjcrone@gmail.com)
 
 # imports
-import subprocess, time
+import subprocess, time, argparse
 
 # get url of the latest podcast episode
 def get_stream_url(stream_name):
@@ -34,30 +34,34 @@ def download_file(stream_name, stream_url, stream_file):
     command = "curl -s -L %s > %s" % (stream_url, stream_file)
     subprocess.call(command, shell=True)
 
-# parse command line
-stream_name = 'majoritylive' # hard code for testing
-stream_name = 'majority' # hard code for testing
-stream_name = 'wnyc' # hard code for testing
-stream_name = 'thegist' # hard code for testing
+# version function
+version = '0.1dev'
+def get_version():
+  return ('%%(prog)s version %s' % version)
+
+# parse arguments
+parser = argparse.ArgumentParser(description='Streamer to bluetooth speakers')
+parser.add_argument('-v', '--version', action='version', version=get_version())
+parser.add_argument("-s", dest="stream_name", metavar="stream", type=str,
+  default='wnyc', help="stream to stream (default: wnyc)")
+parser.add_argument("-q", dest="quiet", action='store_true',
+  default=False, help="suppress screen output")
+args = parser.parse_args()
 
 # define stream parameters based on stream_name
-if stream_name == 'thegist':
+if args.stream_name == 'thegist':
   import requests
-  stream_url = get_stream_url(stream_name)
-  stream_file = '/home/root/btstream/tmp.mp3'
-  download_file(stream_name, stream_url, stream_file)
+  stream_url = get_stream_url(args.stream_name)
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
-if stream_name == 'majority':
+if args.stream_name == 'majority':
   import requests
-  stream_url = get_stream_url(stream_name)
-  stream_file = '/home/root//btstream/tmp.mp3'
-  download_file(stream_name, stream_url, stream_file)
+  stream_url = get_stream_url(args.stream_name)
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
-if stream_name == 'majoritylive':
-  stream_file = 'http://live.majority.fm:8000/live'
+if args.stream_name == 'majoritylive':
+  stream_url = 'http://live.majority.fm:8000/live'
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
-if stream_name == 'wnyc':
-  stream_file = 'http://fm939.wnyc.org/wnycfm'
+if args.stream_name == 'wnyc':
+  stream_url = 'http://fm939.wnyc.org/wnycfm'
   stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
 
 # kill any current streams
@@ -82,5 +86,5 @@ while 1:
   time.sleep(2)
 
 # play stream
-command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/btstream/.btfifo -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_file)
+command = "mplayer -ao pulse::%s -nolirc -prefer-ipv4 -slave -input file=/home/root/btstream/.btfifo -af equalizer=%s -noconsolecontrols %s 2>/dev/null > /dev/null &" % (bt_sink, stream_eq, stream_url)
 subprocess.call(command, shell=True)
