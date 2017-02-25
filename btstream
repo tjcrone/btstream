@@ -52,17 +52,17 @@ args = parser.parse_args()
 if args.stream_name == 'thegist':
   import requests
   stream_url = get_stream_url(args.stream_name)
-  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+  stream_eq = '-4:-4:-2:0:0:0:0:0:0:0'
 if args.stream_name == 'majority':
   import requests
   stream_url = get_stream_url(args.stream_name)
-  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+  stream_eq = '-4:-4:-6:-6:-2:0:0:0:0:0'
 if args.stream_name == 'majoritylive':
   stream_url = 'http://live.majority.fm:8000/live'
-  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+  stream_eq = '-4:-4:-6:-6:-2:0:0:0:0:0'
 if args.stream_name == 'wnyc':
   stream_url = 'http://fm939.wnyc.org/wnycfm'
-  stream_eq = '-12:-12:-2:2:0:0:0:0:0:0'
+  stream_eq = '-4:-4:-6:-2:0:0:0:0:0:0'
 
 # kill any current streams
 command = "killall -q mplayer"
